@@ -1,0 +1,10 @@
+__pycache__/
+user-config.py
+user-password.py
+pywikibot-*.lwp
+
+present_pony_id.txt
+processed.txt
+throttle.ctrl
+logs/
+apicache/
