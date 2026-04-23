@@ -15,11 +15,6 @@ class Family(family.Family):  # noqa: D101
         'en': 'mlp-game-wiki.no',
     }
 
-    def scriptpath(self, code):
-        return {
-            'en': '',
-        }[code]
-
     def protocol(self, code):
         return {
             'en': 'https',
