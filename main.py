@@ -27,6 +27,23 @@ class AppendOnlyPersistence:
             self.present.add(key)
             self.out.write(key + "\n")
 
+def format_duration(seconds: int) -> str:
+    if seconds < 0:
+        raise ValueError("Seconds must be non‑negative")
+
+    hours, remainder = divmod(seconds, 3600)
+    minutes, secs = divmod(remainder, 60)
+
+    parts = []
+    if hours:
+        parts.append(f"{hours}h")
+    if minutes:
+        parts.append(f"{minutes}m")
+    if secs:
+        parts.append(f"{secs}s")
+
+    # If the duration is zero, return "0s".
+    return " ".join(parts) if parts else "0s"
 
 def recouncile(
     page_name: str, template: Template, expected_value: dict[str, Any], order: list[str]
@@ -42,7 +59,7 @@ def recouncile(
                 has_modified = True
         else:
             value = expected_value[key]["value"]
-            if not template.has(key):
+            if not template.has(key) or template.get(key).value.strip() == "":
                 before_which_element = None
                 take_next = False
                 for order_element_key in order:
@@ -117,6 +134,7 @@ class GameDataBot:
                             "Nightmare Parabola",
                             "Nightmare Tree Hugger",
                             "Nightmare Big Mac",
+                            "Wingless Rainbow Dash",
                         ]:
                             continue
                         raise BaseException(
@@ -140,6 +158,10 @@ class GameDataBot:
                     },
                     "bonus": {"value": pony_data["on_arrive_xp"]},
                 }
+                if not pony_data["mg_locked_out"] and not pony_data["start_max_level"]:
+                    expected_values["timer"] = {"value": format_duration(pony_data["time_between_play"])}
+                    expected_values["skip"] = {"value": pony_data["skip_cost"]}
+
                 if not pony_data["no_star_reward"]:
                     mapping_rewards = {
                         "wheel_starmastery": "wheel",
@@ -154,7 +176,6 @@ class GameDataBot:
                     }
                     for i in range(5):
                         reward_data = pony_data["rewards"][i]
-                        print(reward_data, page_name)
                         if not reward_data["id"].startswith(
                             "ProfileAvatar_"
                         ) and not reward_data["id"].startswith("PlayerCardCutieMark_"):
@@ -195,5 +216,5 @@ class GameDataBot:
 
 if __name__ == "__main__":
     bot = GameDataBot("/home/marius/Sync/programming_project/luna-kit/base_built/")
-    # bot.process_page("Bow Tie")
+    #bot.process_page("Daring Do")
     print(bot.process_pages(bot.get_page_name_in_category("Characters")))

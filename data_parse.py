@@ -57,6 +57,8 @@ class DataExtractor:
                 pony_object_data_xml.find("Description").attrib["Unlocal"]
             ),
             "on_arrive_xp": int(pony_object_data_xml.find("OnArrive").attrib["EarnXP"]),
+            "time_between_play": int(pony_object_data_xml.find("Minigames").attrib["TimeBetweenPlayActions"]),
+            "skip_cost": int(pony_object_data_xml.find("Minigames").attrib["PlayActionSkipAgainCost"])
         }
         star_rewards = pony_object_data_xml.find("StarRewards")
         ai = pony_object_data_xml.find("AI")
@@ -73,6 +75,12 @@ class DataExtractor:
             result["no_star_reward"] = False
         else:
             result["no_star_reward"] = True
+        mg_hard_lock = pony_object_data_xml.get("MGHardLock")
+        if mg_hard_lock is not None:
+            result["mg_locked_out"] = True
+        else:
+            result["mg_locked_out"] = False
+
 
         return result
 
